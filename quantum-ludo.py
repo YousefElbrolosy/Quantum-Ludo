@@ -16,13 +16,15 @@ def main():
 
   exit = False
   while not exit:
+    #update game
+
     #exit when the exit button is pressed
     for event in pygame.event.get():
        if event.type == pygame.QUIT:
           exit = True
+       elif event.type == pygame.KEYDOWN:
+          circuit_grid.handle_input(event.key)
 
-    #update game
-    
 
     #draw game
     circuit_grid.draw(screen)
