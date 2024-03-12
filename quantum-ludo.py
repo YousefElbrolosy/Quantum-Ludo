@@ -5,13 +5,13 @@ from data import globals
 from model.circuit_grid_model import CircuitGridModel
 
 pygame.init()
-screen = pygame.display.set_mode((1200,750))
+screen = pygame.display.set_mode((globals.WINDOW_WIDTH,globals.WINDOW_HEIGHT))
 pygame.display.set_caption('Quantum Ludo')
 clock = pygame.time.Clock()
 
 def main():
   #initialize game
-  circuit_grid = CircuitGrid(0, 500, CircuitGridModel(globals.NUM_QUBITS,16))
+  circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM_QUBITS,16))
 
 
   exit = False
