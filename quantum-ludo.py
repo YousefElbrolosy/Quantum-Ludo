@@ -1,16 +1,32 @@
 import pygame
+import numpy
+from controls.circuit_grid import CircuitGrid
+from data import globals
+from model.circuit_grid_model import CircuitGridModel
+
 pygame.init()
 screen = pygame.display.set_mode((1200,750))
 pygame.display.set_caption('Quantum Ludo')
 clock = pygame.time.Clock()
 
 def main():
+  #initialize game
+  circuit_grid = CircuitGrid(0, 500, CircuitGridModel(globals.NUM_QUBITS,16))
+
+
   exit = False
   while not exit:
     #exit when the exit button is pressed
     for event in pygame.event.get():
        if event.type == pygame.QUIT:
           exit = True
+
+    #update game
+    
+
+    #draw game
+    circuit_grid.draw(screen)
+    pygame.display.flip()
 
     #set framerate
     clock.tick(60)
