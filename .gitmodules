@@ -1,0 +1,3 @@
+[submodule "CLudo"]
+	path = CLudo
+	url = https://github.com/YousefElbrolosy/CLudo.git
