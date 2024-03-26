@@ -28,6 +28,9 @@ pygame.display.set_caption("Ludo")
 screen = pygame.display.set_mode((1200, 875))
 
 
+# Circuit Grid setting
+circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM_QUBITS,16))
+
 # Loading Images
 
 board = pygame.image.load('ludo_data/Board.jpg')
@@ -96,7 +99,6 @@ WINNER = [[240, 284], [284, 240], [330, 284], [284, 330]]
 # Blit Token Movement
 
 def show_token(x, y):
-    screen.fill((255, 255, 255))
     screen.blit(board, (0, 0))
 
     for i in SAFE[4:]:
@@ -128,7 +130,6 @@ def show_token(x, y):
 # Bliting in while loop
 
 def blit_all():
-
     for i in SAFE[4:]:
         screen.blit(star, i)
 
@@ -282,12 +283,12 @@ def check_winner():
 
 
 # Main LOOP
-circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM_QUBITS,16))
+
 running = True
 while(running):
     screen.fill((255, 255, 255))
     screen.blit(board, (0, 0)) # Bliting Board
-
+    circuit_grid.draw(screen)
     check_winner()
 
     for event in pygame.event.get():
@@ -325,5 +326,5 @@ while(running):
                         break
 
     blit_all()
-    circuit_grid.draw(screen)
+    
     pygame.display.update()
