@@ -33,29 +33,29 @@ circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM
 
 # Loading Images
 
-board = pygame.image.load('ludo_data/Board.jpg')
-star  = pygame.image.load('ludo_data/star.png')
-one   = pygame.image.load('ludo_data/1.png')
-two   = pygame.image.load('ludo_data/2.png')
-three = pygame.image.load('ludo_data/3.png')
-four  = pygame.image.load('ludo_data/4.png')
-five  = pygame.image.load('ludo_data/5.png')
-six   = pygame.image.load('ludo_data/6.png') 
+board = pygame.image.load('ludo_utils/Board.jpg')
+star  = pygame.image.load('ludo_utils/star.png')
+one   = pygame.image.load('ludo_utils/1.png')
+two   = pygame.image.load('ludo_utils/2.png')
+three = pygame.image.load('ludo_utils/3.png')
+four  = pygame.image.load('ludo_utils/4.png')
+five  = pygame.image.load('ludo_utils/5.png')
+six   = pygame.image.load('ludo_utils/6.png') 
 
-red    = pygame.image.load('ludo_data/red.png')
-blue   = pygame.image.load('ludo_data/blue.png')
-green  = pygame.image.load('ludo_data/green.png')
-yellow = pygame.image.load('ludo_data/yellow.png')
+red    = pygame.image.load('ludo_utils/red.png')
+blue   = pygame.image.load('ludo_utils/blue.png')
+green  = pygame.image.load('ludo_utils/green.png')
+yellow = pygame.image.load('ludo_utils/yellow.png')
 
 DICE  = [one, two, three, four, five, six]
 color = [red, green, yellow, blue]
 
 # Loading Sounds
 
-killSound   = mixer.Sound("ludo_data/Killed.wav")
-tokenSound  = mixer.Sound("ludo_data/Token Movement.wav")
-diceSound   = mixer.Sound("ludo_data/Dice Roll.wav")
-winnerSound = mixer.Sound("ludo_data/Reached Star.wav")
+killSound   = mixer.Sound("ludo_utils/Killed.wav")
+tokenSound  = mixer.Sound("ludo_utils/Token Movement.wav")
+diceSound   = mixer.Sound("ludo_utils/Dice Roll.wav")
+winnerSound = mixer.Sound("ludo_utils/Reached Star.wav")
 
 # Initializing Variables
 
