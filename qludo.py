@@ -324,6 +324,10 @@ while(running):
                             and position[currentPlayer][j][1] <= coordinate[1] <= position[currentPlayer][j][1]+31:
                         move_token(currentPlayer, j)
                         break
+                    
+        if event.type == pygame.MOUSEMOTION:
+              x, y = pygame.mouse.get_pos()  # Get the mouse cursor position
+              print(f"Mouse is at ({x}, {y})")
 
     blit_all()
     
