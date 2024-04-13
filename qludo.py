@@ -22,6 +22,7 @@ import time
 import numpy
 from qiskit import QuantumCircuit
 from qiskit import execute
+import qiskit
 from qiskit_aer import Aer
 from controls.circuit_grid import CircuitGrid
 from data import globals
@@ -133,22 +134,17 @@ def show_token(x, y):
 
 # Quantum Dice
 def quantum_dice():
-    # Create a quantum circuit with 3 qubits
-    qc = QuantumCircuit(3)
-
-    # Apply Hadamard gates to put each qubit in superposition
-    qc.h([0, 1, 2])
+    #from video 
+    simulator = Aer.get_backend('statevector_simulator')
+    circuit = circuit_grid.circuit_grid_model.compute_circuit();
+    transpiled_circuit = qiskit.transpile(circuit, simulator)
+    statevector = simulator.run(transpiled_circuit, shots = 100).result()
 
     # Measure the qubits
-    qc.measure_all()
-
-    # Execute the circuit on a quantum simulator
-    backend = Aer.get_backend('qasm_simulator')
-    job = execute(qc, backend, shots=1)
-    result = job.result()
+    circuit.measure_all()
 
     # Convert the binary result to a decimal number between 1 and 6
-    dice_roll = int(list(result.get_counts(qc).keys())[0], 2) + 1
+    dice_roll = int(list(statevector.get_counts(circuit).keys())[0], 2) + 1
     if dice_roll > 6:
         return quantum_dice()
     else:
