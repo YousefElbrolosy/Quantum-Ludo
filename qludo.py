@@ -20,6 +20,9 @@ import time
 
 # Initializing pygame
 import numpy
+from qiskit import QuantumCircuit
+from qiskit import execute
+from qiskit_aer import Aer
 from controls.circuit_grid import CircuitGrid
 from data import globals
 from model.circuit_grid_model import CircuitGridModel
@@ -126,6 +129,30 @@ def show_token(x, y):
 
     pygame.display.update()
     time.sleep(0.5)
+
+
+# Quantum Dice
+def quantum_dice():
+    # Create a quantum circuit with 3 qubits
+    qc = QuantumCircuit(3)
+
+    # Apply Hadamard gates to put each qubit in superposition
+    qc.h([0, 1, 2])
+
+    # Measure the qubits
+    qc.measure_all()
+
+    # Execute the circuit on a quantum simulator
+    backend = Aer.get_backend('qasm_simulator')
+    job = execute(qc, backend, shots=1)
+    result = job.result()
+
+    # Convert the binary result to a decimal number between 1 and 6
+    dice_roll = int(list(result.get_counts(qc).keys())[0], 2) + 1
+    if dice_roll > 6:
+        return quantum_dice()
+    else:
+        return dice_roll
 
 # Bliting in while loop
 
@@ -305,7 +332,7 @@ while(running):
 
             # Rolling Dice
             if not diceRolled and (605 <= coordinate[0] <= 669) and (270 <= coordinate[1] <= 334):
-                number = random.randint(1, 6)
+                number = quantum_dice()
                 diceSound.play()
                 flag = True
                 for i in range(len(position[currentPlayer])):
