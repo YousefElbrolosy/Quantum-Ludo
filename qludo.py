@@ -134,7 +134,7 @@ def show_token(x, y):
 
 # Quantum Dice
 def quantum_dice():
-    #from video 
+    #circuit
     simulator = Aer.get_backend('statevector_simulator')
     circuit = circuit_grid.circuit_grid_model.compute_circuit();
     transpiled_circuit = qiskit.transpile(circuit, simulator)
