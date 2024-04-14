@@ -138,17 +138,29 @@ def quantum_dice():
     simulator = Aer.get_backend('statevector_simulator')
     circuit = circuit_grid.circuit_grid_model.compute_circuit();
     transpiled_circuit = qiskit.transpile(circuit, simulator)
-    statevector = simulator.run(transpiled_circuit, shots = 100).result()
+    statevector = simulator.run(transpiled_circuit, shots = 100).result().get_statevector()
+    print(statevector)
 
-    # Measure the qubits
-    circuit.measure_all()
+    # Get the magnitudes of the statevector
+    magnitudes = numpy.abs(statevector)**2
+    # Ignore the last two elements of the magnitudes
+    magnitudes = magnitudes[:6]
+    epsilon = 1e-7
+    magnitudes = magnitudes + epsilon
 
-    # Convert the binary result to a decimal number between 1 and 6
-    dice_roll = int(list(statevector.get_counts(circuit).keys())[0], 2) + 1
-    if dice_roll > 6:
-        return quantum_dice()
-    else:
-        return dice_roll
+    # Normalize the magnitudes so they sum to 1
+    magnitudes = magnitudes / numpy.sum(magnitudes)
+    print(magnitudes)
+
+    # Create a list of possible dice rolls
+    dice_rolls = list(range(1, 7))
+
+    # Choose a dice roll based on the magnitudes as probabilities
+    dice_roll = numpy.random.choice(dice_rolls, p=magnitudes)
+
+    # Return the list of dice rolls
+    print(dice_roll)
+    return dice_roll
 
 # Bliting in while loop
 
@@ -348,9 +360,9 @@ while(running):
                         move_token(currentPlayer, j)
                         break
                     
-        if event.type == pygame.MOUSEMOTION:
-              x, y = pygame.mouse.get_pos()  # Get the mouse cursor position
-              print(f"Mouse is at ({x}, {y})")
+        # if event.type == pygame.MOUSEMOTION:
+        #       x, y = pygame.mouse.get_pos()  # Get the mouse cursor position
+        #       print(f"Mouse is at ({x}, {y})")
 
     blit_all()
     
