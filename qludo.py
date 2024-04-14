@@ -20,10 +20,10 @@ import time
 
 # Initializing pygame
 import numpy
-from qiskit import QuantumCircuit
+from qiskit import Aer, QuantumCircuit
 from qiskit import execute
 import qiskit
-from qiskit_aer import Aer
+#from qiskit_aer import Aer
 from controls.circuit_grid import CircuitGrid
 from data import globals
 from model.circuit_grid_model import CircuitGridModel
@@ -45,13 +45,14 @@ three = pygame.image.load('ludo_utils/3.png')
 four  = pygame.image.load('ludo_utils/4.png')
 five  = pygame.image.load('ludo_utils/5.png')
 six   = pygame.image.load('ludo_utils/6.png') 
+seven   = pygame.image.load('ludo_utils/7.png') 
 
 red    = pygame.image.load('ludo_utils/red.png')
 blue   = pygame.image.load('ludo_utils/blue.png')
 green  = pygame.image.load('ludo_utils/green.png')
 yellow = pygame.image.load('ludo_utils/yellow.png')
 
-DICE  = [one, two, three, four, five, six]
+DICE  = [one, two, three, four, five, six, seven]
 color = [red, green, yellow, blue]
 
 # Loading Sounds
@@ -63,7 +64,7 @@ winnerSound = mixer.Sound("ludo_utils/Reached Star.wav")
 
 # Initializing Variables
 
-number        = 1
+number        = 0
 currentPlayer = 0
 playerKilled  = False
 diceRolled    = False
@@ -111,8 +112,11 @@ def show_token(x, y):
     for i in range(len(position)):
         for j in position[i]:
             screen.blit(color[i], j)
+    if (number==0  or number==7):
+        screen.blit(pygame.transform.scale(DICE[6],(64,64)), (605, 270))
+    else:
+        screen.blit(DICE[number-1], (605, 270))
 
-    screen.blit(DICE[number-1], (605, 270))
 
     if position[x][y] in WINNER:
         winnerSound.play()
@@ -136,30 +140,28 @@ def show_token(x, y):
 def quantum_dice():
     #circuit
     simulator = Aer.get_backend('statevector_simulator')
-    circuit = circuit_grid.circuit_grid_model.compute_circuit();
+    circuit = circuit_grid.circuit_grid_model.compute_circuit()
     transpiled_circuit = qiskit.transpile(circuit, simulator)
     statevector = simulator.run(transpiled_circuit, shots = 100).result().get_statevector()
-    print(statevector)
 
     # Get the magnitudes of the statevector
     magnitudes = numpy.abs(statevector)**2
     # Ignore the last two elements of the magnitudes
-    magnitudes = magnitudes[:6]
     epsilon = 1e-7
     magnitudes = magnitudes + epsilon
 
     # Normalize the magnitudes so they sum to 1
     magnitudes = magnitudes / numpy.sum(magnitudes)
+
     print(magnitudes)
 
     # Create a list of possible dice rolls
-    dice_rolls = list(range(1, 7))
+    dice_rolls = list(range(0, 8))
 
     # Choose a dice roll based on the magnitudes as probabilities
     dice_roll = numpy.random.choice(dice_rolls, p=magnitudes)
 
     # Return the list of dice rolls
-    print(dice_roll)
     return dice_roll
 
 # Bliting in while loop
@@ -171,8 +173,10 @@ def blit_all():
     for i in range(len(position)):
         for j in position[i]:
             screen.blit(color[i], j)
-
-    screen.blit(DICE[number-1], (605, 270))
+    if (number==0  or number==7):
+        screen.blit(pygame.transform.scale(DICE[6],(64,64)), (605, 270))
+    else:
+        screen.blit(DICE[number-1], (605, 270))
 
     screen.blit(color[currentPlayer], (620, 28))
     screen.blit(currentPlayerText, (600, 10))
@@ -340,17 +344,20 @@ while(running):
 
             # Rolling Dice
             if not diceRolled and (605 <= coordinate[0] <= 669) and (270 <= coordinate[1] <= 334):
-                number = quantum_dice()
-                diceSound.play()
-                flag = True
-                for i in range(len(position[currentPlayer])):
-                    if tuple(position[currentPlayer][i]) not in HOME[currentPlayer] and to_home(currentPlayer, i):
-                        flag = False
-                if (flag and number == 6) or not flag:
-                    diceRolled = True
 
-                else:
-                    currentPlayer = (currentPlayer+1) % 4
+                number = quantum_dice()
+                
+                diceSound.play()
+                if (number!= 0 and number!=7):
+                    flag = True
+                    for i in range(len(position[currentPlayer])):
+                        if tuple(position[currentPlayer][i]) not in HOME[currentPlayer] and to_home(currentPlayer, i):
+                            flag = False
+                    if (flag and number == 6) or not flag:
+                        diceRolled = True
+
+                    else:
+                        currentPlayer = (currentPlayer+1) % 4
 
             # Moving Player
             elif diceRolled:
