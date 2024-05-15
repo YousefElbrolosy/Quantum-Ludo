@@ -86,7 +86,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         return
 
     def move_to_adjacent_node(self, direction):
-        if direction == MOVE_LEFT and self.selected_column > 0:
+        if direction == MOVE_LEFT and self.selected_column > 1:
             self.selected_column -= 1
         elif direction == MOVE_RIGHT and self.selected_column < self.circuit_grid_model.max_columns - 1:
             self.selected_column += 1

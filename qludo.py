@@ -31,7 +31,7 @@ pygame.init()
 pygame.display.set_caption("Ludo")
 screen = pygame.display.set_mode((1200, 875))
 
-
+gate_count = 4
 # Circuit Grid setting
 circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM_QUBITS,16))
 
@@ -85,7 +85,7 @@ HOME = [[(110, 58),  (61, 107),  (152, 107), (110, 152)],  # Red
         [(110, 415), (61, 464),  (152, 464), (110, 510)]]  # Blue
 
         # Red      # Green    # Yellow    # Blue
-SAFE = [(50, 240), (328, 50), (520, 328), (240, 520),
+SAFE = [(50, 240), (328, 50), (520, 328), (240, 520),   # the yellow paths (safe paths)
         (88, 328), (240, 88), (482, 240), (328, 482)]
 
 position = [[[110, 58],  [61, 107],  [152, 107], [110, 152]],  # Red
@@ -220,15 +220,19 @@ def move_token(x, y):
         tokenSound.play()
         diceRolled = False
 
-    # Moving token which is not in HOME
+    # Moving token which is not in HOME 
     elif tuple(position[x][y]) not in HOME[currentPlayer]:
         diceRolled = False
+        #switching player
         if not number == 6:
             currentPlayer = (currentPlayer+1) % 4
+            gate_count = 4
 
         # Way to WINNER position
 
         #  R2
+
+                  #yel checker num
         if (position[x][y][1] == 284 and position[x][y][0] <= 202 and x == 0) \
                 and (position[x][y][0] + 38*number <= WINNER[x][0]):
             for i in range(number):
@@ -323,6 +327,15 @@ def check_winner():
 
 # Main LOOP
 
+circuit_grid.handle_input(pygame.K_h)
+circuit_grid.handle_input(pygame.K_s)
+circuit_grid.handle_input(pygame.K_h)
+circuit_grid.handle_input(pygame.K_s)
+circuit_grid.handle_input(pygame.K_h)
+circuit_grid.handle_input(pygame.K_w)
+circuit_grid.handle_input(pygame.K_w)
+circuit_grid.handle_input(pygame.K_d)
+
 running = True
 while(running):
     screen.fill((255, 255, 255))
@@ -331,12 +344,22 @@ while(running):
     check_winner()
 
     for event in pygame.event.get():
-
+        
         # Event QUIT
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            circuit_grid.handle_input(event.key)
+            print("0: ",gate_count)
+            if(event.key == pygame.K_DELETE and gate_count <4):
+                gate_count+=1
+                print("1: ",gate_count)
+            if(gate_count>0 or event.key == pygame.K_DELETE or (event.key!= pygame.K_w and event.key!= pygame.K_a and event.key!= pygame.K_s and event.key!= pygame.K_d and  event.key!= pygame.K_c and event.key!= pygame.K_LEFT and event.key!= pygame.K_RIGHT and  event.key!= pygame.K_DOWN and event.key!= pygame.K_UP)):
+                circuit_grid.handle_input(event.key)
+                print("2: ",gate_count)
+            if(event.key!= pygame.K_w and event.key!= pygame.K_a and event.key!= pygame.K_s and event.key!= pygame.K_d and  event.key!= pygame.K_c and event.key!= pygame.K_LEFT and event.key!= pygame.K_RIGHT and  event.key!= pygame.K_DOWN and event.key!= pygame.K_UP and event.key!=pygame.K_DELETE and gate_count!= 0):
+                gate_count-=1
+                print("3: ",gate_count)
+                
 
         # When MOUSEBUTTON is clicked
         if event.type == pygame.MOUSEBUTTONUP:
