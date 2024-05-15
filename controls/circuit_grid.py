@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+
+
+#You have to fall exactly on the arrows to start moving to your home
+
+
 import pygame
 import numpy as np
 from utils.colors import *
