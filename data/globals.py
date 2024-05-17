@@ -20,3 +20,6 @@ MEASUREMENT_COOLDOWN_TIME = 4000
 
 # score to win a game
 WIN_SCORE = 1
+
+# number of gates per turn
+GATE_COUNT = 5

@@ -20,9 +20,11 @@ import time
 
 # Initializing pygame
 import numpy
+import qiskit
+from qiskit import *
 from qiskit import Aer, QuantumCircuit
 from qiskit import execute
-import qiskit
+
 #from qiskit_aer import Aer
 from controls.circuit_grid import CircuitGrid
 from data import globals
@@ -31,9 +33,15 @@ pygame.init()
 pygame.display.set_caption("Ludo")
 screen = pygame.display.set_mode((1200, 875))
 
-gate_count = 4
+import matplotlib.pyplot as plt
+
+from qiskit_aer import AerSimulator
+from qiskit.circuit.library import *
+from qiskit_aer.noise import (NoiseModel, depolarizing_error)
+
+
 # Circuit Grid setting
-circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM_QUBITS,16))
+
 
 # Loading Images
 
@@ -101,8 +109,24 @@ jump = {(202, 240): (240, 202),  # R1 -> G3
          # Red        # Green     # Yellow    # Blue
 WINNER = [[240, 284], [284, 240], [330, 284], [284, 330]]
 
+
+
+
 # Blit Token Movement
 
+def createGrid():
+
+    circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM_QUBITS,16))
+    circuit_grid.handle_input(pygame.K_h)
+    circuit_grid.handle_input(pygame.K_s)
+    circuit_grid.handle_input(pygame.K_h)
+    circuit_grid.handle_input(pygame.K_s)
+    circuit_grid.handle_input(pygame.K_h)
+    circuit_grid.handle_input(pygame.K_w)
+    circuit_grid.handle_input(pygame.K_w)
+    circuit_grid.handle_input(pygame.K_d)
+    globals.GATE_COUNT=5
+    return circuit_grid
 def show_token(x, y):
     screen.blit(board, (0, 0))
 
@@ -141,6 +165,7 @@ def quantum_dice():
     #circuit
     simulator = Aer.get_backend('statevector_simulator')
     circuit = circuit_grid.circuit_grid_model.compute_circuit()
+    
     transpiled_circuit = qiskit.transpile(circuit, simulator)
     statevector = simulator.run(transpiled_circuit, shots = 100).result().get_statevector()
 
@@ -165,6 +190,69 @@ def quantum_dice():
     return dice_roll
 
 # Bliting in while loop
+
+
+# Define the noise model
+def noise():
+    i_error = depolarizing_error(0.3, 1)
+    noise_model = NoiseModel()
+    noise_model.add_all_qubit_quantum_error(i_error, "i_with_error")
+    return noise_model
+
+# Define the noisy gate
+def noise_circuit():
+    # This should be qc = QuantumCircuit(1)
+    # Measuring for demostration purposes
+    qc = QuantumCircuit(1)
+    i_gate = IGate(label="i_with_error")
+    qc.append(i_gate, [0])
+    return qc
+
+# 3 qubit encoding circuit
+def encoding_circuit():
+    qc = QuantumCircuit(3)
+    qc.cx(0,1)
+    qc.cx(0,2)
+    return qc
+# 3 qubit decoding circuit
+def decoding_circuit():
+    qc = QuantumCircuit(3)
+    qc.cx(0,1)
+    qc.cx(0,2)
+    qc.ccx(2, 1, 0)   
+    return qc
+
+# 3 qubit hadamard addition
+def phase_correction():
+    qc = QuantumCircuit(3)
+    qc.h(0)
+    qc.h(1)
+    qc.h(2)
+    return qc
+
+def error_correcting_circuit():
+    qc = QuantumCircuit(9)
+    
+    qc = qc.compose(encoding_circuit(), [0,3,6])
+    qc = qc.compose(phase_correction(), [0,3,6])
+    
+    qc = qc.compose(encoding_circuit(), [0,1,2])
+    qc = qc.compose(encoding_circuit(), [3,4,5])
+    qc = qc.compose(encoding_circuit(), [6,7,8])
+    
+    qc.barrier()
+    qc = qc.compose(noise_circuit(), [0])
+    qc.barrier()
+
+    
+    qc = qc.compose(decoding_circuit(), [0,1,2])
+    qc = qc.compose(decoding_circuit(), [3,4,5])
+    qc = qc.compose(decoding_circuit(), [6,7,8])
+        
+    qc = qc.compose(phase_correction(), [0,3,6])
+    qc = qc.compose(decoding_circuit(), [0,3,6])
+    
+    return qc
 
 def blit_all():
     for i in SAFE[4:]:
@@ -226,7 +314,10 @@ def move_token(x, y):
         #switching player
         if not number == 6:
             currentPlayer = (currentPlayer+1) % 4
-            gate_count = 4
+            globals.GATE_COUNT = 5
+            global circuit_grid
+            circuit_grid = createGrid()
+
 
         # Way to WINNER position
 
@@ -327,14 +418,7 @@ def check_winner():
 
 # Main LOOP
 
-circuit_grid.handle_input(pygame.K_h)
-circuit_grid.handle_input(pygame.K_s)
-circuit_grid.handle_input(pygame.K_h)
-circuit_grid.handle_input(pygame.K_s)
-circuit_grid.handle_input(pygame.K_h)
-circuit_grid.handle_input(pygame.K_w)
-circuit_grid.handle_input(pygame.K_w)
-circuit_grid.handle_input(pygame.K_d)
+circuit_grid = createGrid()
 
 running = True
 while(running):
@@ -349,16 +433,9 @@ while(running):
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            print("0: ",gate_count)
-            if(event.key == pygame.K_DELETE and gate_count <4):
-                gate_count+=1
-                print("1: ",gate_count)
-            if(gate_count>0 or event.key == pygame.K_DELETE or (event.key!= pygame.K_w and event.key!= pygame.K_a and event.key!= pygame.K_s and event.key!= pygame.K_d and  event.key!= pygame.K_c and event.key!= pygame.K_LEFT and event.key!= pygame.K_RIGHT and  event.key!= pygame.K_DOWN and event.key!= pygame.K_UP)):
-                circuit_grid.handle_input(event.key)
-                print("2: ",gate_count)
-            if(event.key!= pygame.K_w and event.key!= pygame.K_a and event.key!= pygame.K_s and event.key!= pygame.K_d and  event.key!= pygame.K_c and event.key!= pygame.K_LEFT and event.key!= pygame.K_RIGHT and  event.key!= pygame.K_DOWN and event.key!= pygame.K_UP and event.key!=pygame.K_DELETE and gate_count!= 0):
-                gate_count-=1
-                print("3: ",gate_count)
+            circuit_grid.handle_input(event.key)
+            print(globals.GATE_COUNT)
+
                 
 
         # When MOUSEBUTTON is clicked
