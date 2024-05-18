@@ -22,8 +22,7 @@ import time
 import numpy
 import qiskit
 from qiskit import *
-from qiskit import Aer, QuantumCircuit
-from qiskit import execute
+from qiskit import QuantumCircuit
 
 #from qiskit_aer import Aer
 from controls.circuit_grid import CircuitGrid
@@ -32,8 +31,6 @@ from model.circuit_grid_model import CircuitGridModel
 pygame.init()
 pygame.display.set_caption("Ludo")
 screen = pygame.display.set_mode((1200, 875))
-
-import matplotlib.pyplot as plt
 
 from qiskit_aer import AerSimulator
 from qiskit.circuit.library import *
@@ -163,45 +160,34 @@ def show_token(x, y):
 # Quantum Dice
 def quantum_dice():
     #circuit
-    #simulator = Aer.get_backend('statevector_simulator')
+    simulator = AerSimulator(noise_model = noise())
     circuit = circuit_grid.circuit_grid_model.compute_circuit()
-    
+    full_circuit = QuantumCircuit(19, 3)
 
-    full_circuit = QuantumCircuit(27)
+
     full_circuit = full_circuit.compose(circuit, [0,9,18])
     full_circuit = full_circuit.compose(error_correcting_circuit(), range(9))
     full_circuit = full_circuit.compose(error_correcting_circuit(), range(9,18))
-    full_circuit = full_circuit.compose(error_correcting_circuit(), range(18, 27))
 
-
-    simulator = AerSimulator(noise_model = noise())
+    full_circuit.measure(0,0)
+    full_circuit.measure(9,1)
+    full_circuit.measure(18,2)
+    
     transpiled_circuit = qiskit.transpile(full_circuit, simulator)
-    dict_count = simulator.run(transpiled_circuit, shots = 100).result().get_counts()
+    counts = simulator.run(transpiled_circuit, shots = 1).result().get_counts(transpiled_circuit)
 
+    # Display the counts
+    print("Counts:", counts)
 
+    # Extract the bitstring from the counts
+    bitstring = list(counts.keys())[0]
 
+    # Convert the bitstring to an integer
+    dice_roll = int(bitstring, 2)
 
-    """
-    # Get the magnitudes of the statevector
-    magnitudes = numpy.abs(statevector)**2
-    # Ignore the last two elements of the magnitudes
-    epsilon = 1e-7
-    magnitudes = magnitudes + epsilon
-
-    # Normalize the magnitudes so they sum to 1
-    magnitudes = magnitudes / numpy.sum(magnitudes)
-
-    print(magnitudes)
-
-    # Create a list of possible dice rolls
-    dice_rolls = list(range(0, 8))
-
-    # Choose a dice roll based on the magnitudes as probabilities
-    dice_roll = numpy.random.choice(dice_rolls, p=magnitudes)
-
-    # Return the list of dice rolls
-        """
-    return dict_count
+    print("dice roll: ", dice_roll)
+    # Return the dice roll
+    return dice_roll
 
 # Bliting in while loop
 

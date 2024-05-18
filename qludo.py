@@ -22,8 +22,7 @@ import time
 import numpy
 import qiskit
 from qiskit import *
-from qiskit import Aer, QuantumCircuit
-from qiskit import execute
+from qiskit import QuantumCircuit
 
 #from qiskit_aer import Aer
 from controls.circuit_grid import CircuitGrid
@@ -33,7 +32,6 @@ pygame.init()
 pygame.display.set_caption("Ludo")
 screen = pygame.display.set_mode((1200, 875))
 
-import matplotlib.pyplot as plt
 
 from qiskit_aer import AerSimulator
 from qiskit.circuit.library import *
