@@ -32,7 +32,6 @@ pygame.init()
 pygame.display.set_caption("Ludo")
 screen = pygame.display.set_mode((1200, 875))
 
-
 from qiskit_aer import AerSimulator
 from qiskit.circuit.library import *
 from qiskit_aer.noise import (NoiseModel, depolarizing_error)
@@ -161,30 +160,33 @@ def show_token(x, y):
 # Quantum Dice
 def quantum_dice():
     #circuit
-    simulator = Aer.get_backend('statevector_simulator')
+    simulator = AerSimulator(noise_model = noise())
     circuit = circuit_grid.circuit_grid_model.compute_circuit()
+    full_circuit = QuantumCircuit(19, 3)
+
+
+    full_circuit = full_circuit.compose(circuit, [0,9,18])
+    full_circuit = full_circuit.compose(error_correcting_circuit(), range(9))
+    full_circuit = full_circuit.compose(error_correcting_circuit(), range(9,18))
+
+    full_circuit.measure(0,0)
+    full_circuit.measure(9,1)
+    full_circuit.measure(18,2)
     
-    transpiled_circuit = qiskit.transpile(circuit, simulator)
-    statevector = simulator.run(transpiled_circuit, shots = 100).result().get_statevector()
+    transpiled_circuit = qiskit.transpile(full_circuit, simulator)
+    counts = simulator.run(transpiled_circuit, shots = 1).result().get_counts(transpiled_circuit)
 
-    # Get the magnitudes of the statevector
-    magnitudes = numpy.abs(statevector)**2
-    # Ignore the last two elements of the magnitudes
-    epsilon = 1e-7
-    magnitudes = magnitudes + epsilon
+    # Display the counts
+    print("Counts:", counts)
 
-    # Normalize the magnitudes so they sum to 1
-    magnitudes = magnitudes / numpy.sum(magnitudes)
+    # Extract the bitstring from the counts
+    bitstring = list(counts.keys())[0]
 
-    print(magnitudes)
+    # Convert the bitstring to an integer
+    dice_roll = int(bitstring, 2)
 
-    # Create a list of possible dice rolls
-    dice_rolls = list(range(0, 8))
-
-    # Choose a dice roll based on the magnitudes as probabilities
-    dice_roll = numpy.random.choice(dice_rolls, p=magnitudes)
-
-    # Return the list of dice rolls
+    print("dice roll: ", dice_roll)
+    # Return the dice roll
     return dice_roll
 
 # Bliting in while loop
@@ -400,6 +402,8 @@ def move_token(x, y):
                         position[i][j] = list(HOME[i][j])
                         killSound.play()
                         currentPlayer = (currentPlayer+3) % 4
+                        globals.GATE_COUNT = 5
+                        circuit_grid = createGrid()
 
 
 # Checking Winner
@@ -412,6 +416,9 @@ def check_winner():
         winnerRank.append(currentPlayer)
     else:
         currentPlayer = (currentPlayer + 1) % 4
+        globals.GATE_COUNT = 5
+        global circuit_grid
+        circuit_grid = createGrid()
 
 
 # Main LOOP
@@ -456,6 +463,8 @@ while(running):
 
                     else:
                         currentPlayer = (currentPlayer+1) % 4
+                        globals.GATE_COUNT = 5
+                        circuit_grid = createGrid()
 
             # Moving Player
             elif diceRolled:

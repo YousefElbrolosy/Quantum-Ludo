@@ -402,6 +402,8 @@ def move_token(x, y):
                         position[i][j] = list(HOME[i][j])
                         killSound.play()
                         currentPlayer = (currentPlayer+3) % 4
+                        globals.GATE_COUNT = 5
+                        circuit_grid = createGrid()
 
 
 # Checking Winner
@@ -414,6 +416,9 @@ def check_winner():
         winnerRank.append(currentPlayer)
     else:
         currentPlayer = (currentPlayer + 1) % 4
+        globals.GATE_COUNT = 5
+        global circuit_grid
+        circuit_grid = createGrid()
 
 
 # Main LOOP
@@ -458,6 +463,8 @@ while(running):
 
                     else:
                         currentPlayer = (currentPlayer+1) % 4
+                        globals.GATE_COUNT = 5
+                        circuit_grid = createGrid()
 
             # Moving Player
             elif diceRolled:
