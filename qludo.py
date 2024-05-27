@@ -20,6 +20,11 @@ import time
 
 # Initializing pygame
 import numpy
+import qiskit
+from qiskit import *
+from qiskit import QuantumCircuit
+
+#from qiskit_aer import Aer
 from controls.circuit_grid import CircuitGrid
 from data import globals
 from model.circuit_grid_model import CircuitGridModel
@@ -27,9 +32,13 @@ pygame.init()
 pygame.display.set_caption("Ludo")
 screen = pygame.display.set_mode((1200, 875))
 
+from qiskit_aer import AerSimulator
+from qiskit.circuit.library import *
+from qiskit_aer.noise import (NoiseModel, depolarizing_error)
+
 
 # Circuit Grid setting
-circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM_QUBITS,16))
+
 
 # Loading Images
 
@@ -41,13 +50,14 @@ three = pygame.image.load('ludo_utils/3.png')
 four  = pygame.image.load('ludo_utils/4.png')
 five  = pygame.image.load('ludo_utils/5.png')
 six   = pygame.image.load('ludo_utils/6.png') 
+seven   = pygame.image.load('ludo_utils/7.png') 
 
 red    = pygame.image.load('ludo_utils/red.png')
 blue   = pygame.image.load('ludo_utils/blue.png')
 green  = pygame.image.load('ludo_utils/green.png')
 yellow = pygame.image.load('ludo_utils/yellow.png')
 
-DICE  = [one, two, three, four, five, six]
+DICE  = [one, two, three, four, five, six, seven]
 color = [red, green, yellow, blue]
 
 # Loading Sounds
@@ -59,7 +69,7 @@ winnerSound = mixer.Sound("ludo_utils/Reached Star.wav")
 
 # Initializing Variables
 
-number        = 1
+number        = 0
 currentPlayer = 0
 playerKilled  = False
 diceRolled    = False
@@ -80,7 +90,7 @@ HOME = [[(110, 58),  (61, 107),  (152, 107), (110, 152)],  # Red
         [(110, 415), (61, 464),  (152, 464), (110, 510)]]  # Blue
 
         # Red      # Green    # Yellow    # Blue
-SAFE = [(50, 240), (328, 50), (520, 328), (240, 520),
+SAFE = [(50, 240), (328, 50), (520, 328), (240, 520),   # the yellow paths (safe paths)
         (88, 328), (240, 88), (482, 240), (328, 482)]
 
 position = [[[110, 58],  [61, 107],  [152, 107], [110, 152]],  # Red
@@ -96,8 +106,24 @@ jump = {(202, 240): (240, 202),  # R1 -> G3
          # Red        # Green     # Yellow    # Blue
 WINNER = [[240, 284], [284, 240], [330, 284], [284, 330]]
 
+
+
+
 # Blit Token Movement
 
+def createGrid():
+
+    circuit_grid = CircuitGrid(5, globals.FIELD_HEIGHT, CircuitGridModel(globals.NUM_QUBITS,16))
+    circuit_grid.handle_input(pygame.K_h)
+    circuit_grid.handle_input(pygame.K_s)
+    circuit_grid.handle_input(pygame.K_h)
+    circuit_grid.handle_input(pygame.K_s)
+    circuit_grid.handle_input(pygame.K_h)
+    circuit_grid.handle_input(pygame.K_w)
+    circuit_grid.handle_input(pygame.K_w)
+    circuit_grid.handle_input(pygame.K_d)
+    globals.GATE_COUNT=5
+    return circuit_grid
 def show_token(x, y):
     screen.blit(board, (0, 0))
 
@@ -107,8 +133,11 @@ def show_token(x, y):
     for i in range(len(position)):
         for j in position[i]:
             screen.blit(color[i], j)
+    if (number==0  or number==7):
+        screen.blit(pygame.transform.scale(DICE[6],(64,64)), (605, 270))
+    else:
+        screen.blit(DICE[number-1], (605, 270))
 
-    screen.blit(DICE[number-1], (605, 270))
 
     if position[x][y] in WINNER:
         winnerSound.play()
@@ -127,7 +156,103 @@ def show_token(x, y):
     pygame.display.update()
     time.sleep(0.5)
 
+
+# Quantum Dice
+def quantum_dice():
+    #circuit
+    simulator = AerSimulator(noise_model = noise())
+    circuit = circuit_grid.circuit_grid_model.compute_circuit()
+    full_circuit = QuantumCircuit(19, 3)
+
+
+    full_circuit = full_circuit.compose(circuit, [0,9,18])
+    full_circuit = full_circuit.compose(error_correcting_circuit(), range(9))
+    full_circuit = full_circuit.compose(error_correcting_circuit(), range(9,18))
+
+    full_circuit.measure(0,0)
+    full_circuit.measure(9,1)
+    full_circuit.measure(18,2)
+    
+    transpiled_circuit = qiskit.transpile(full_circuit, simulator)
+    counts = simulator.run(transpiled_circuit, shots = 1).result().get_counts(transpiled_circuit)
+
+    # Display the counts
+    print("Counts:", counts)
+
+    # Extract the bitstring from the counts
+    bitstring = list(counts.keys())[0]
+
+    # Convert the bitstring to an integer
+    dice_roll = int(bitstring, 2)
+
+    print("dice roll: ", dice_roll)
+    # Return the dice roll
+    return dice_roll
+
 # Bliting in while loop
+
+
+# Define the noise model
+def noise():
+    i_error = depolarizing_error(0.3, 1)
+    noise_model = NoiseModel()
+    noise_model.add_all_qubit_quantum_error(i_error, "i_with_error")
+    return noise_model
+
+# Define the noisy gate
+def noise_circuit():
+    # This should be qc = QuantumCircuit(1)
+    # Measuring for demostration purposes
+    qc = QuantumCircuit(1)
+    i_gate = IGate(label="i_with_error")
+    qc.append(i_gate, [0])
+    return qc
+
+# 3 qubit encoding circuit
+def encoding_circuit():
+    qc = QuantumCircuit(3)
+    qc.cx(0,1)
+    qc.cx(0,2)
+    return qc
+# 3 qubit decoding circuit
+def decoding_circuit():
+    qc = QuantumCircuit(3)
+    qc.cx(0,1)
+    qc.cx(0,2)
+    qc.ccx(2, 1, 0)   
+    return qc
+
+# 3 qubit hadamard addition
+def phase_correction():
+    qc = QuantumCircuit(3)
+    qc.h(0)
+    qc.h(1)
+    qc.h(2)
+    return qc
+
+def error_correcting_circuit():
+    qc = QuantumCircuit(9)
+    
+    qc = qc.compose(encoding_circuit(), [0,3,6])
+    qc = qc.compose(phase_correction(), [0,3,6])
+    
+    qc = qc.compose(encoding_circuit(), [0,1,2])
+    qc = qc.compose(encoding_circuit(), [3,4,5])
+    qc = qc.compose(encoding_circuit(), [6,7,8])
+    
+    qc.barrier()
+    qc = qc.compose(noise_circuit(), [0])
+    qc.barrier()
+
+    
+    qc = qc.compose(decoding_circuit(), [0,1,2])
+    qc = qc.compose(decoding_circuit(), [3,4,5])
+    qc = qc.compose(decoding_circuit(), [6,7,8])
+        
+    qc = qc.compose(phase_correction(), [0,3,6])
+    qc = qc.compose(decoding_circuit(), [0,3,6])
+    
+    return qc
 
 def blit_all():
     for i in SAFE[4:]:
@@ -136,8 +261,10 @@ def blit_all():
     for i in range(len(position)):
         for j in position[i]:
             screen.blit(color[i], j)
-
-    screen.blit(DICE[number-1], (605, 270))
+    if (number==0  or number==7):
+        screen.blit(pygame.transform.scale(DICE[6],(64,64)), (605, 270))
+    else:
+        screen.blit(DICE[number-1], (605, 270))
 
     screen.blit(color[currentPlayer], (620, 28))
     screen.blit(currentPlayerText, (600, 10))
@@ -181,15 +308,22 @@ def move_token(x, y):
         tokenSound.play()
         diceRolled = False
 
-    # Moving token which is not in HOME
+    # Moving token which is not in HOME 
     elif tuple(position[x][y]) not in HOME[currentPlayer]:
         diceRolled = False
+        #switching player
         if not number == 6:
             currentPlayer = (currentPlayer+1) % 4
+            globals.GATE_COUNT = 5
+            global circuit_grid
+            circuit_grid = createGrid()
+
 
         # Way to WINNER position
 
         #  R2
+
+                  #yel checker num
         if (position[x][y][1] == 284 and position[x][y][0] <= 202 and x == 0) \
                 and (position[x][y][0] + 38*number <= WINNER[x][0]):
             for i in range(number):
@@ -268,6 +402,8 @@ def move_token(x, y):
                         position[i][j] = list(HOME[i][j])
                         killSound.play()
                         currentPlayer = (currentPlayer+3) % 4
+                        globals.GATE_COUNT = 5
+                        circuit_grid = createGrid()
 
 
 # Checking Winner
@@ -280,9 +416,14 @@ def check_winner():
         winnerRank.append(currentPlayer)
     else:
         currentPlayer = (currentPlayer + 1) % 4
+        globals.GATE_COUNT = 5
+        global circuit_grid
+        circuit_grid = createGrid()
 
 
 # Main LOOP
+
+circuit_grid = createGrid()
 
 running = True
 while(running):
@@ -292,12 +433,15 @@ while(running):
     check_winner()
 
     for event in pygame.event.get():
-
+        
         # Event QUIT
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             circuit_grid.handle_input(event.key)
+            print(globals.GATE_COUNT)
+
+                
 
         # When MOUSEBUTTON is clicked
         if event.type == pygame.MOUSEBUTTONUP:
@@ -305,17 +449,22 @@ while(running):
 
             # Rolling Dice
             if not diceRolled and (605 <= coordinate[0] <= 669) and (270 <= coordinate[1] <= 334):
-                number = random.randint(1, 6)
-                diceSound.play()
-                flag = True
-                for i in range(len(position[currentPlayer])):
-                    if tuple(position[currentPlayer][i]) not in HOME[currentPlayer] and to_home(currentPlayer, i):
-                        flag = False
-                if (flag and number == 6) or not flag:
-                    diceRolled = True
 
-                else:
-                    currentPlayer = (currentPlayer+1) % 4
+                number = quantum_dice()
+                
+                diceSound.play()
+                if (number!= 0 and number!=7):
+                    flag = True
+                    for i in range(len(position[currentPlayer])):
+                        if tuple(position[currentPlayer][i]) not in HOME[currentPlayer] and to_home(currentPlayer, i):
+                            flag = False
+                    if (flag and number == 6) or not flag:
+                        diceRolled = True
+
+                    else:
+                        currentPlayer = (currentPlayer+1) % 4
+                        globals.GATE_COUNT = 5
+                        circuit_grid = createGrid()
 
             # Moving Player
             elif diceRolled:
@@ -324,6 +473,10 @@ while(running):
                             and position[currentPlayer][j][1] <= coordinate[1] <= position[currentPlayer][j][1]+31:
                         move_token(currentPlayer, j)
                         break
+                    
+        # if event.type == pygame.MOUSEMOTION:
+        #       x, y = pygame.mouse.get_pos()  # Get the mouse cursor position
+        #       print(f"Mouse is at ({x}, {y})")
 
     blit_all()
     

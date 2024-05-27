@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+
+
+#You have to fall exactly on the arrows to start moving to your home
+
+
 import pygame
 import numpy as np
 from utils.colors import *
@@ -30,6 +36,7 @@ GATE_TILE_WIDTH = 43
 GATE_TILE_HEIGHT = 45
 
 LINE_WIDTH = 1
+
 
 
 class CircuitGrid(pygame.sprite.RenderPlain):
@@ -86,7 +93,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         return
 
     def move_to_adjacent_node(self, direction):
-        if direction == MOVE_LEFT and self.selected_column > 0:
+        if direction == MOVE_LEFT and self.selected_column > 1:
             self.selected_column -= 1
         elif direction == MOVE_RIGHT and self.selected_column < self.circuit_grid_model.max_columns - 1:
             self.selected_column += 1
@@ -137,37 +144,42 @@ class CircuitGrid(pygame.sprite.RenderPlain):
 
     def handle_input_x(self):
         selected_node_gate_part = self.get_selected_node_gate_part()
-        if selected_node_gate_part == node_types.EMPTY:
+        if selected_node_gate_part == node_types.EMPTY and globals.GATE_COUNT!=0:
             circuit_grid_node = CircuitGridNode(node_types.X)
             self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            globals.GATE_COUNT-=1
         self.update()
 
     def handle_input_i(self):
         selected_node_gate_part = self.get_selected_node_gate_part()
-        if selected_node_gate_part == node_types.EMPTY:
+        if selected_node_gate_part == node_types.EMPTY and globals.GATE_COUNT!=0:
             circuit_grid_node = CircuitGridNode(node_types.IDEN)
             self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            globals.GATE_COUNT-=1
         self.update()
 
     def handle_input_y(self):
         selected_node_gate_part = self.get_selected_node_gate_part()
-        if selected_node_gate_part == node_types.EMPTY:
+        if selected_node_gate_part == node_types.EMPTY and globals.GATE_COUNT!=0:
             circuit_grid_node = CircuitGridNode(node_types.Y)
             self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            globals.GATE_COUNT-=1
         self.update()
 
     def handle_input_z(self):
         selected_node_gate_part = self.get_selected_node_gate_part()
-        if selected_node_gate_part == node_types.EMPTY:
+        if selected_node_gate_part == node_types.EMPTY and globals.GATE_COUNT!=0:
             circuit_grid_node = CircuitGridNode(node_types.Z)
             self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            globals.GATE_COUNT-=1
         self.update()
 
     def handle_input_h(self):
         selected_node_gate_part = self.get_selected_node_gate_part()
-        if selected_node_gate_part == node_types.EMPTY:
+        if selected_node_gate_part == node_types.EMPTY and globals.GATE_COUNT!=0:
             circuit_grid_node = CircuitGridNode(node_types.H)
             self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            globals.GATE_COUNT-=1
         self.update()
 
     def handle_input_delete(self):
@@ -178,6 +190,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                 selected_node_gate_part == node_types.Z or \
                 selected_node_gate_part == node_types.H:
             self.delete_controls_for_gate(self.selected_wire, self.selected_column)
+            globals.GATE_COUNT+=1
 
         if selected_node_gate_part == node_types.CTRL:
             gate_wire_num = \
@@ -188,6 +201,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                 #                       max(self.selected_wire, gate_wire_num) + 1):
                 #     print("Replacing wire ", wire_idx, " in column ", self.selected_column)
                 #     self.circuit_grid_model.set_node(wire_idx, self.selected_column, node_types.IDEN)
+                globals.GATE_COUNT-=1
         elif selected_node_gate_part != node_types.SWAP and \
                 selected_node_gate_part != node_types.CTRL and \
                 selected_node_gate_part != node_types.TRACE:
