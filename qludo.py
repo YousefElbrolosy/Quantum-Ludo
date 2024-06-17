@@ -52,10 +52,13 @@ five  = pygame.image.load('ludo_utils/5.png')
 six   = pygame.image.load('ludo_utils/6.png') 
 seven   = pygame.image.load('ludo_utils/7.png') 
 
+
+
 red    = pygame.image.load('ludo_utils/red.png')
 blue   = pygame.image.load('ludo_utils/blue.png')
 green  = pygame.image.load('ludo_utils/green.png')
 yellow = pygame.image.load('ludo_utils/yellow.png')
+
 
 DICE  = [one, two, three, four, five, six, seven]
 color = [red, green, yellow, blue]
@@ -66,6 +69,7 @@ killSound   = mixer.Sound("ludo_utils/Killed.wav")
 tokenSound  = mixer.Sound("ludo_utils/Token Movement.wav")
 diceSound   = mixer.Sound("ludo_utils/Dice Roll.wav")
 winnerSound = mixer.Sound("ludo_utils/Reached Star.wav")
+background_music = mixer.music.load("utils/415804__sunsai__mushroom-background-music.wav")
 
 # Initializing Variables
 
@@ -80,7 +84,8 @@ winnerRank    = []
 font = pygame.font.Font('freesansbold.ttf', 11)
 FONT = pygame.font.Font('freesansbold.ttf', 16)
 currentPlayerText = font.render('Current Player', True, (0, 0, 0))
-line = font.render('------------------------------------', True, (0, 0, 0))
+line = font.render('----------------------', True, (0, 0, 0))
+rulesText = font.render('Rules:', True, (0,0,0))
 
 # Defining Important Coordinates
 
@@ -424,10 +429,82 @@ def check_winner():
 # Main LOOP
 
 circuit_grid = createGrid()
+mixer.music.set_volume(0.1)
+#mixer.music.play(-1)
+
+def settings():
+    font_title = pygame.font.Font('data/fonts/pong.ttf',50)
+    font_title_border = pygame.font.Font('data/fonts/pong.ttf',50)
+    game_controls_txt = font_title.render("How to Play",True,'gold')
+    game_controls_border = font_title_border.render("How to PLAY",True,'black')
+    pygame.draw.rect(screen,'gray', pygame.Rect(700, 150, 475, 400),550,50)
+    text_1 = font.render("1- YOU HAVE UP TO 5 GATES TO USE PER TURN.    ",True,'black')
+    text_1_1 = font.render("GATES ARE:                       X, Y, Z, H, I, CNOT (X+C)",True,'black')
+    text_2 = font.render("2- MOVE BETWEEN THE DIFFERENT WIRES BY (W A S D) KEYBOARD KEYS",True,'black')
+    text_3 = font.render("3- YOU CAN APPLY ROTATION ON THE X, Y, Z GATES BY",True,'black')
+    text_4 = font.render("(LEFT AND RIGHT) ARROW KEYS",True,'black')
+    text_4_1 = font.render("4- AFTER USING YOUR 5 GATES TO BIAS THE DICE, CLICK ON THE DICE TO ROLL!",True,'black')
+    text_5 = font.render("5- BY DEFAULT WITHOUT ADDING ANY GATES, DICE HAS EQUAL PROBABILITY OF",True,'black')
+    text_6 = font.render("0 TO 7 ",True,'black')
+    text_6_1 = font.render("6- TRY TO AVOID LANDING YOUR DICE ON 0 OR 7 THEY WASTE YOUR TURN!",True,'black')
+    text_7 = font.render("7- AFTER THAT IT IS A NORMAL LUDO GAME ENJOY!",True,'black')
+
+
+    screen.blit(game_controls_border,(798,88))
+    screen.blit(game_controls_border,(802,88))
+    screen.blit(game_controls_border,(800,91))
+    screen.blit(game_controls_border,(800,85))
+    screen.blit(game_controls_txt,((800,88)))
+    screen.blit(text_1,(720,180))
+    screen.blit(text_1_1,(720,200))
+    screen.blit(text_2,(720,250))
+    screen.blit(text_3,(720,300))
+    screen.blit(text_4,(720,320))
+    screen.blit(text_4_1,(720,370))
+    screen.blit(text_5,(720,420))
+    screen.blit(text_6,(720,440))
+    screen.blit(text_6_1,(720,470))
+    screen.blit(text_7,(720,520))
+
+
+
+
+
+
+
 
 running = True
 while(running):
+    #screen.blit(background,(0,0))
     screen.fill((255, 255, 255))
+
+    settings()
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     screen.blit(board, (0, 0)) # Bliting Board
     circuit_grid.draw(screen)
     check_winner()
