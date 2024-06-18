@@ -127,7 +127,7 @@ def createGrid():
     circuit_grid.handle_input(pygame.K_w)
     circuit_grid.handle_input(pygame.K_w)
     circuit_grid.handle_input(pygame.K_d)
-    globals.GATE_COUNT=5
+    globals.GATE_COUNT=4
     return circuit_grid
 def show_token(x, y):
     screen.blit(board, (0, 0))
@@ -319,7 +319,7 @@ def move_token(x, y):
         #switching player
         if not number == 6:
             currentPlayer = (currentPlayer+1) % 4
-            globals.GATE_COUNT = 5
+            globals.GATE_COUNT = 4
             global circuit_grid
             circuit_grid = createGrid()
 
@@ -340,20 +340,20 @@ def move_token(x, y):
                 and (position[x][y][0] - 38*number >= WINNER[x][0]):
             for i in range(number):
                 position[x][y][0] -= 38
-                show_token()
+                show_token(x,y)
 
         #  G2
         elif (position[x][y][0] == 284 and position[x][y][1] <= 202 and x == 1) \
                 and (position[x][y][1] + 38*number <= WINNER[x][1]):
             for i in range(number):
                 position[x][y][1] += 38
-                show_token()
+                show_token(x,y)
         #  B2
         elif (position[x][y][0] == 284 and position[x][y][1] >= 368 and x == 3) \
                 and (position[x][y][1] - 38*number >= WINNER[x][1]):
             for i in range(number):
                 position[x][y][1] -= 38
-                show_token()
+                show_token(x,y)
 
         # Other Paths
         else:
@@ -407,7 +407,7 @@ def move_token(x, y):
                         position[i][j] = list(HOME[i][j])
                         killSound.play()
                         currentPlayer = (currentPlayer+3) % 4
-                        globals.GATE_COUNT = 5
+                        globals.GATE_COUNT = 4
                         circuit_grid = createGrid()
 
 
@@ -421,7 +421,7 @@ def check_winner():
         winnerRank.append(currentPlayer)
     else:
         currentPlayer = (currentPlayer + 1) % 4
-        globals.GATE_COUNT = 5
+        globals.GATE_COUNT = 4
         global circuit_grid
         circuit_grid = createGrid()
 
@@ -433,38 +433,39 @@ mixer.music.set_volume(0.1)
 #mixer.music.play(-1)
 
 def settings():
+    x=-50
     font_title = pygame.font.Font('data/fonts/pong.ttf',50)
     font_title_border = pygame.font.Font('data/fonts/pong.ttf',50)
     game_controls_txt = font_title.render("How to Play",True,'gold')
     game_controls_border = font_title_border.render("How to PLAY",True,'black')
-    pygame.draw.rect(screen,'gray', pygame.Rect(700, 150, 475, 400),550,50)
-    text_1 = font.render("1- YOU HAVE UP TO 5 GATES TO USE PER TURN.    ",True,'black')
+    pygame.draw.rect(screen,'gray', pygame.Rect(705, 150+x, 475, 400),550,50)
+    text_1 = font.render("1- YOU HAVE UP TO 4 GATES TO USE PER TURN.    ",True,'black')
     text_1_1 = font.render("GATES ARE:                       X, Y, Z, H, I, CNOT (X+C)",True,'black')
     text_2 = font.render("2- MOVE BETWEEN THE DIFFERENT WIRES BY (W A S D) KEYBOARD KEYS",True,'black')
     text_3 = font.render("3- YOU CAN APPLY ROTATION ON THE X, Y, Z GATES BY",True,'black')
     text_4 = font.render("(LEFT AND RIGHT) ARROW KEYS",True,'black')
-    text_4_1 = font.render("4- AFTER USING YOUR 5 GATES TO BIAS THE DICE, CLICK ON THE DICE TO ROLL!",True,'black')
+    text_4_1 = font.render("4- AFTER USING YOUR 4 GATES TO BIAS THE DICE, CLICK ON THE DICE TO ROLL!",True,'black')
     text_5 = font.render("5- BY DEFAULT WITHOUT ADDING ANY GATES, DICE HAS EQUAL PROBABILITY OF",True,'black')
     text_6 = font.render("0 TO 7 ",True,'black')
     text_6_1 = font.render("6- TRY TO AVOID LANDING YOUR DICE ON 0 OR 7 THEY WASTE YOUR TURN!",True,'black')
     text_7 = font.render("7- AFTER THAT IT IS A NORMAL LUDO GAME ENJOY!",True,'black')
 
 
-    screen.blit(game_controls_border,(798,88))
-    screen.blit(game_controls_border,(802,88))
-    screen.blit(game_controls_border,(800,91))
-    screen.blit(game_controls_border,(800,85))
-    screen.blit(game_controls_txt,((800,88)))
-    screen.blit(text_1,(720,180))
-    screen.blit(text_1_1,(720,200))
-    screen.blit(text_2,(720,250))
-    screen.blit(text_3,(720,300))
-    screen.blit(text_4,(720,320))
-    screen.blit(text_4_1,(720,370))
-    screen.blit(text_5,(720,420))
-    screen.blit(text_6,(720,440))
-    screen.blit(text_6_1,(720,470))
-    screen.blit(text_7,(720,520))
+    screen.blit(game_controls_border,(798,x+88))
+    screen.blit(game_controls_border,(802,x+88))
+    screen.blit(game_controls_border,(800,x+91))
+    screen.blit(game_controls_border,(800,x+85))
+    screen.blit(game_controls_txt,((800,x+88)))
+    screen.blit(text_1,(720,x+180))
+    screen.blit(text_1_1,(720,x+200))
+    screen.blit(text_2,(720,x+250))
+    screen.blit(text_3,(720,x+300))
+    screen.blit(text_4,(720,x+320))
+    screen.blit(text_4_1,(720,x+370))
+    screen.blit(text_5,(720,x+420))
+    screen.blit(text_6,(720,x+440))
+    screen.blit(text_6_1,(720,x+470))
+    screen.blit(text_7,(720,x+520))
 
 
 
@@ -540,8 +541,12 @@ while(running):
 
                     else:
                         currentPlayer = (currentPlayer+1) % 4
-                        globals.GATE_COUNT = 5
+                        globals.GATE_COUNT = 4
                         circuit_grid = createGrid()
+                else:
+                    currentPlayer = (currentPlayer+1) % 4
+                    globals.GATE_COUNT = 4
+                    circuit_grid = createGrid()
 
             # Moving Player
             elif diceRolled:
