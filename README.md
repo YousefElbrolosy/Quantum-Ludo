@@ -25,5 +25,10 @@ You can install Qiskit using pip:
 pip install qiskit
 ```
 
+To install the game locally
+```
+$ git clone https://github.com/YousefElbrolosy/Quantum-Ludo.git
+```
+
 
 This code uses [Sahaj Mistry's](https://github.com/i-sahajmistry/Ludo.git) Classical version of Ludo as well as James Weaver's quantum-circuit-pygame [package](https://github.com/JavaFXpert/quantum-circuit-pygame).
