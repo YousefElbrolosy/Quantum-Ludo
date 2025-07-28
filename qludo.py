@@ -127,7 +127,7 @@ def createGrid():
     circuit_grid.handle_input(pygame.K_w)
     circuit_grid.handle_input(pygame.K_w)
     circuit_grid.handle_input(pygame.K_d)
-    globals.GATE_COUNT=4
+    globals.GATE_COUNT=3
     return circuit_grid
 def show_token(x, y):
     screen.blit(board, (0, 0))
@@ -439,16 +439,16 @@ def settings():
     game_controls_txt = font_title.render("How to Play",True,'gold')
     game_controls_border = font_title_border.render("How to PLAY",True,'black')
     pygame.draw.rect(screen,'gray', pygame.Rect(705, 150+x, 475, 400),550,50)
-    text_1 = font.render("1- YOU HAVE UP TO 4 GATES TO USE PER TURN.    ",True,'black')
-    text_1_1 = font.render("GATES ARE:                       X, Y, Z, H, I, CNOT (X+C)",True,'black')
+    text_1 = font.render("1- YOU HAVE UP TO 3 GATES TO USE PER TURN.    ",True,'black')
+    text_1_1 = font.render("GATES ARE:                       X, Y, Z, H, I, CNOT(X+C), CH(H+C), CY(Y+C), CZ(Z+C)",True,'black')
     text_2 = font.render("2- MOVE BETWEEN THE DIFFERENT WIRES BY (W A S D) KEYBOARD KEYS",True,'black')
     text_3 = font.render("3- YOU CAN APPLY ROTATION ON THE X, Y, Z GATES BY",True,'black')
     text_4 = font.render("(LEFT AND RIGHT) ARROW KEYS",True,'black')
-    text_4_1 = font.render("4- AFTER USING YOUR 4 GATES TO BIAS THE DICE, CLICK ON THE DICE TO ROLL!",True,'black')
-    text_5 = font.render("5- BY DEFAULT WITHOUT ADDING ANY GATES, DICE HAS EQUAL PROBABILITY OF",True,'black')
-    text_6 = font.render("0 TO 7 ",True,'black')
-    text_6_1 = font.render("6- TRY TO AVOID LANDING YOUR DICE ON 0 OR 7 THEY WASTE YOUR TURN!",True,'black')
-    text_7 = font.render("7- AFTER THAT IT IS A NORMAL LUDO GAME ENJOY!",True,'black')
+    text_4_1 = font.render("4- AFTER USING YOUR 3 GATES TO BIAS THE DICE, CLICK ON THE DICE TO ROLL!",True,'black')
+    #text_5 = font.render("5- BY DEFAULT WITHOUT ADDING ANY GATES, DICE HAS EQUAL PROBABILITY OF",True,'black')
+    #text_6 = font.render("0 TO 7 ",True,'black')
+    text_6_1 = font.render("5- TRY TO AVOID LANDING YOUR DICE ON 0 OR 7 THEY WASTE YOUR TURN!",True,'black')
+    text_7 = font.render("6- AFTER THAT IT IS A NORMAL LUDO GAME ENJOY!",True,'black')
 
 
     screen.blit(game_controls_border,(798,x+88))
@@ -462,13 +462,10 @@ def settings():
     screen.blit(text_3,(720,x+300))
     screen.blit(text_4,(720,x+320))
     screen.blit(text_4_1,(720,x+370))
-    screen.blit(text_5,(720,x+420))
-    screen.blit(text_6,(720,x+440))
+    #screen.blit(text_5,(720,x+420))
+    #screen.blit(text_6,(720,x+440))
     screen.blit(text_6_1,(720,x+470))
     screen.blit(text_7,(720,x+520))
-
-
-
 
 
 
