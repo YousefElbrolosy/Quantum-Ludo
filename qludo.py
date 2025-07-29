@@ -162,48 +162,21 @@ def show_token(x, y):
     time.sleep(0.5)
 
 
-# # Quantum Dice
-# def quantum_dice():
-#     #circuit
-#     simulator = AerSimulator()
-#     circuit = circuit_grid.circuit_grid_model.compute_circuit()
-#     full_circuit = QuantumCircuit(19, 3)
-
-
-#     full_circuit = full_circuit.compose(circuit, [0,9,18])
-#     full_circuit = full_circuit.compose(error_correcting_circuit(), range(9))
-#     full_circuit = full_circuit.compose(error_correcting_circuit(), range(9,18))
-
-#     full_circuit.measure(0,0)
-#     full_circuit.measure(9,1)
-#     full_circuit.measure(18,2)
-    
-#     transpiled_circuit = qiskit.transpile(full_circuit, simulator)
-#     counts = simulator.run(transpiled_circuit, shots = 1).result().get_counts(transpiled_circuit)
-
-#     # Display the counts
-#     print("Counts:", counts)
-
-#     # Extract the bitstring from the counts
-#     bitstring = list(counts.keys())[0]
-
-#     # Convert the bitstring to an integer
-#     dice_roll = int(bitstring, 2)
-
-#     print("dice roll: ", dice_roll)
-#     # Return the dice roll
-#     return dice_roll
+# Quantum Dice
 def quantum_dice():
     #circuit
     simulator = AerSimulator()
     circuit = circuit_grid.circuit_grid_model.compute_circuit()
-    full_circuit = QuantumCircuit(3, 3)
+    full_circuit = QuantumCircuit(19, 3)
 
-    full_circuit = full_circuit.compose(circuit, [0,1,2])
+
+    full_circuit = full_circuit.compose(circuit, [0,9,18])
+    full_circuit = full_circuit.compose(error_correcting_circuit(), range(9))
+    full_circuit = full_circuit.compose(error_correcting_circuit(), range(9,18))
 
     full_circuit.measure(0,0)
-    full_circuit.measure(1,1)
-    full_circuit.measure(2,2)
+    full_circuit.measure(9,1)
+    full_circuit.measure(18,2)
     
     transpiled_circuit = qiskit.transpile(full_circuit, simulator)
     counts = simulator.run(transpiled_circuit, shots = 1).result().get_counts(transpiled_circuit)
@@ -220,71 +193,98 @@ def quantum_dice():
     print("dice roll: ", dice_roll)
     # Return the dice roll
     return dice_roll
+# def quantum_dice():
+#     #circuit
+#     simulator = AerSimulator()
+#     circuit = circuit_grid.circuit_grid_model.compute_circuit()
+#     full_circuit = QuantumCircuit(3, 3)
+
+#     full_circuit = full_circuit.compose(circuit, [0,1,2])
+
+#     full_circuit.measure(0,0)
+#     full_circuit.measure(1,1)
+#     full_circuit.measure(2,2)
+    
+#     transpiled_circuit = qiskit.transpile(full_circuit, simulator)
+#     counts = simulator.run(transpiled_circuit, shots = 1).result().get_counts(transpiled_circuit)
+
+#     # Display the counts
+#     print("Counts:", counts)
+
+#     # Extract the bitstring from the counts
+#     bitstring = list(counts.keys())[0]
+
+#     # Convert the bitstring to an integer
+#     dice_roll = int(bitstring, 2)
+
+#     print("dice roll: ", dice_roll)
+#     # Return the dice roll
+#     return dice_roll
 
 # Bliting in while loop
 
 
 # # Define the noise model
-# def noise():
-#     i_error = depolarizing_error(0.3, 1)
-#     noise_model = NoiseModel()
-#     noise_model.add_all_qubit_quantum_error(i_error, "i_with_error")
-#     return noise_model
+def noise():
+    i_error = depolarizing_error(0.3, 1)
+    noise_model = NoiseModel()
+    noise_model.add_all_qubit_quantum_error(i_error, "i_with_error")
+    return noise_model
 
-# # Define the noisy gate
-# def noise_circuit():
-#     # This should be qc = QuantumCircuit(1)
-#     # Measuring for demostration purposes
-#     qc = QuantumCircuit(1)
-#     i_gate = IGate(label="i_with_error")
-#     qc.append(i_gate, [0])
-#     return qc
+# Define the noisy gate
+def noise_circuit():
+    # This should be qc = QuantumCircuit(1)
+    # Measuring for demostration purposes
+    qc = QuantumCircuit(1)
+    i_gate = IGate(label="i_with_error")
+    qc.append(i_gate, [0])
+    return qc
 
-# # 3 qubit encoding circuit
-# def encoding_circuit():
-#     qc = QuantumCircuit(3)
-#     qc.cx(0,1)
-#     qc.cx(0,2)
-#     return qc
-# # 3 qubit decoding circuit
-# def decoding_circuit():
-#     qc = QuantumCircuit(3)
-#     qc.cx(0,1)
-#     qc.cx(0,2)
-#     qc.ccx(2, 1, 0)   
-#     return qc
+# 3 qubit encoding circuit
+def encoding_circuit():
+    qc = QuantumCircuit(3)
+    qc.cx(0,1)
+    qc.cx(0,2)
+    return qc
+# 3 qubit decoding circuit
+def decoding_circuit():
+    qc = QuantumCircuit(3)
+    qc.cx(0,1)
+    qc.cx(0,2)
+    qc.ccx(2, 1, 0)   
+    return qc
 
-# # 3 qubit hadamard addition
-# def phase_correction():
-#     qc = QuantumCircuit(3)
-#     qc.h(0)
-#     qc.h(1)
-#     qc.h(2)
-#     return qc
+# 3 qubit hadamard addition
+def phase_correction():
+    qc = QuantumCircuit(3)
+    qc.h(0)
+    qc.h(1)
+    qc.h(2)
+    return qc
 
-# def error_correcting_circuit():
-#     qc = QuantumCircuit(9)
+def error_correcting_circuit():
+    qc = QuantumCircuit(9)
     
-#     qc = qc.compose(encoding_circuit(), [0,3,6])
-#     qc = qc.compose(phase_correction(), [0,3,6])
+    qc = qc.compose(encoding_circuit(), [0,3,6])
+    qc = qc.compose(phase_correction(), [0,3,6])
     
-#     qc = qc.compose(encoding_circuit(), [0,1,2])
-#     qc = qc.compose(encoding_circuit(), [3,4,5])
-#     qc = qc.compose(encoding_circuit(), [6,7,8])
+    qc = qc.compose(encoding_circuit(), [0,1,2])
+    qc = qc.compose(encoding_circuit(), [3,4,5])
+    qc = qc.compose(encoding_circuit(), [6,7,8])
     
-#     qc.barrier()
-#     qc = qc.compose(noise_circuit(), [0])
-#     qc.barrier()
+    qc.barrier()
+    qc = qc.compose(noise_circuit(), [0])
+    qc.barrier()
 
     
-#     qc = qc.compose(decoding_circuit(), [0,1,2])
-#     qc = qc.compose(decoding_circuit(), [3,4,5])
-#     qc = qc.compose(decoding_circuit(), [6,7,8])
+    qc = qc.compose(decoding_circuit(), [0,1,2])
+    qc = qc.compose(decoding_circuit(), [3,4,5])
+    qc = qc.compose(decoding_circuit(), [6,7,8])
         
-#     qc = qc.compose(phase_correction(), [0,3,6])
-#     qc = qc.compose(decoding_circuit(), [0,3,6])
+    qc = qc.compose(phase_correction(), [0,3,6])
+    qc = qc.compose(decoding_circuit(), [0,3,6])
     
-#     return qc
+    return qc
 
 def blit_all():
     for i in SAFE[4:]:
